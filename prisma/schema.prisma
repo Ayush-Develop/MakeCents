@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  accounts      Account[]
+  transactions  Transaction[]
+  categories    Category[]
+  investments   Investment[]
+  trades        Trade[]
+  goals         InvestmentGoal[]
+}
+
+model Account {
+  id            String      @id @default(cuid())
+  userId        String
+  name          String
+  type          String      // CHECKING, SAVINGS, CREDIT_CARD, BROKERAGE, RETIREMENT_401K, etc.
+  provider      String?     // e.g., "robinhood", "webull", "chase", etc.
+  accountNumber String?     // Last 4 digits or identifier
+  balance       Float       @default(0)
+  currency      String      @default("USD")
+  isActive      Boolean     @default(true)
+  apiKey        String?     // Encrypted API credentials
+  apiSecret     String?     // Encrypted API credentials
+  metadata      String?     // JSON string for additional data
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  investments   Investment[]
+  trades        Trade[]
+  
+  @@index([userId])
+}
+
+model Category {
+  id            String      @id @default(cuid())
+  userId        String
+  name          String
+  type          String      // EXPENSE, INCOME, TRANSFER
+  color         String?     // Hex color for UI
+  icon          String?     // Icon identifier
+  parentId      String?     // For subcategories
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  parent        Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      Category[]  @relation("CategoryHierarchy")
+  
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Transaction {
+  id            String      @id @default(cuid())
+  userId        String
+  accountId     String
+  categoryId    String?
+  amount        Float
+  type          String      // EXPENSE, INCOME, TRANSFER
+  description   String
+  date          DateTime
+  merchant      String?
+  tags          String?     // JSON array of tags
+  notes         String?
+  isRecurring   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account       Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category      Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([accountId])
+  @@index([date])
+  @@index([categoryId])
+}
+
+model Investment {
+  id            String      @id @default(cuid())
+  userId        String
+  accountId     String
+  symbol        String
+  name          String?
+  type          String      // STOCK, ETF, CRYPTO, OPTION, BOND, MUTUAL_FUND, OTHER
+  quantity      Float
+  averageCost   Float       // Average purchase price
+  currentPrice  Float?      // Latest price
+  totalValue    Float       // quantity * currentPrice
+  totalCost     Float       // quantity * averageCost
+  unrealizedGain Float      @default(0) // totalValue - totalCost
+  lastUpdated   DateTime    @default(now())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account       Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  trades        Trade[]
+  
+  @@unique([userId, accountId, symbol])
+  @@index([userId])
+  @@index([accountId])
+}
+
+model Trade {
+  id            String      @id @default(cuid())
+  userId        String
+  accountId     String
+  investmentId  String?
+  symbol        String
+  type          String      // BUY, SELL
+  quantity      Float
+  price         Float
+  fees          Float       @default(0)
+  totalAmount   Float       // quantity * price + fees
+  date          DateTime
+  notes         String?
+  strategy      String?     // Trading strategy used
+  outcome       String?     // PROFIT, LOSS, BREAK_EVEN, PENDING
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account       Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  investment    Investment? @relation(fields: [investmentId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([accountId])
+  @@index([date])
+  @@index([symbol])
+}
+
+model InvestmentGoal {
+  id            String      @id @default(cuid())
+  userId        String
+  name          String
+  description   String?
+  targetAmount  Float
+  currentAmount Float       @default(0)
+  targetDate    DateTime?
+  priority      Int         @default(0)
+  isCompleted   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+
