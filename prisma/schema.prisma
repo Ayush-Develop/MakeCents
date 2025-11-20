@@ -24,6 +24,9 @@ model User {
   investments   Investment[]
   trades        Trade[]
   goals         InvestmentGoal[]
+  settings      UserSettings?
+  planRules     PlanRule[]
+  planMetadata  PlanMetadata[]
 }
 
 model Account {
@@ -46,6 +49,7 @@ model Account {
   transactions  Transaction[]
   investments   Investment[]
   trades        Trade[]
+  fundingGoals  InvestmentGoal[]
   
   @@index([userId])
 }
@@ -58,6 +62,8 @@ model Category {
   color         String?     // Hex color for UI
   icon          String?     // Icon identifier
   parentId      String?     // For subcategories
+  budgetType    String      @default("WANT") // NEED, WANT, SAVINGS, DEBT
+  budgetTarget  Float?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
@@ -160,12 +166,56 @@ model InvestmentGoal {
   targetDate    DateTime?
   priority      Int         @default(0)
   isCompleted   Boolean     @default(false)
+  monthlyTarget Float?
+  fundingAccountId String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fundingAccount Account?   @relation(fields: [fundingAccountId], references: [id], onDelete: SetNull)
   
   @@index([userId])
 }
 
+model UserSettings {
+  userId                 String  @id
+  monthlyNetIncomeGoal   Float?
+  emergencyFundTargetMonths Int  @default(6)
+  planVersion            String?
+  onboardingCompleted    Boolean @default(false)
+  stepsCompleted         String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
+  user                   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PlanRule {
+  id          String   @id @default(cuid())
+  userId      String
+  ruleType    String
+  isEnabled   Boolean  @default(true)
+  targetValue Float?
+  metadata    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, ruleType])
+  @@index([userId])
+}
+
+model PlanMetadata {
+  id        String   @id @default(cuid())
+  userId    String
+  key       String
+  value     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
+}

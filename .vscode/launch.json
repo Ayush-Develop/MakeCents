@@ -2,25 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug: API Routes Only",
-      "type": "node",
+      "name": "Next.js: Debug Browser",
+      "type": "chrome",
       "request": "launch",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next",
-      "windows": {
-        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/next.cmd"
-      },
-      "runtimeArgs": ["dev"],
-      "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**", "node_modules/**"],
-      "env": {
-        "NODE_OPTIONS": "--inspect"
-      },
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
       "sourceMaps": true,
-      "resolveSourceMapLocations": [
-        "${workspaceFolder}/**",
-        "!**/node_modules/**"
-      ]
+      "sourceMapPathOverrides": {
+        "webpack://_N_E/*": "${webRoot}/*",
+        "webpack:///./*": "${webRoot}/*",
+        "webpack:///./~/*": "${webRoot}/node_modules/*"
+      }
     },
     {
       "name": "Debug: Server Components",

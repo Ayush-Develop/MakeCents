@@ -21,46 +21,74 @@ const institutionColors = [
   'bg-orange-600',
 ]
 
-const institutionLogoMap: Record<string, string> = {
-  bankofamerica: 'https://logo.clearbit.com/bankofamerica.com',
-  chase: 'https://logo.clearbit.com/chase.com',
-  wellsfargo: 'https://logo.clearbit.com/wellsfargo.com',
-  citibank: 'https://logo.clearbit.com/citi.com',
-  usbank: 'https://logo.clearbit.com/usbank.com',
-  pncbank: 'https://logo.clearbit.com/pnc.com',
-  capitalone: 'https://logo.clearbit.com/capitalone.com',
-  tdbank: 'https://logo.clearbit.com/tdbank.com',
-  suntrust: 'https://logo.clearbit.com/suntrust.com',
-  bbt: 'https://logo.clearbit.com/bbt.com',
-  navyfederalcreditunion: 'https://logo.clearbit.com/navyfederal.org',
-  stateemployeescreditunion: 'https://logo.clearbit.com/ncsecu.org',
-  pentagonfederalcreditunion: 'https://logo.clearbit.com/penfed.org',
-  allybank: 'https://logo.clearbit.com/ally.com',
-  discoverbank: 'https://logo.clearbit.com/discover.com',
-  americanexpress: 'https://logo.clearbit.com/americanexpress.com',
-  charlesschwab: 'https://logo.clearbit.com/schwab.com',
-  fidelity: 'https://logo.clearbit.com/fidelity.com',
-  vanguard: 'https://logo.clearbit.com/vanguard.com',
-  robinhood: 'https://logo.clearbit.com/robinhood.com',
-  webull: 'https://logo.clearbit.com/webull.com',
-  etrade: 'https://logo.clearbit.com/etrade.com',
-  tdameritrade: 'https://logo.clearbit.com/tdameritrade.com',
-  interactivebrokers: 'https://logo.clearbit.com/interactivebrokers.com',
-  merrilllynch: 'https://logo.clearbit.com/ml.com',
-  morganstanley: 'https://logo.clearbit.com/morganstanley.com',
-  goldmansachs: 'https://logo.clearbit.com/goldmansachs.com',
+const gradientByType: Record<string, string> = {
+  CHECKING: 'from-slate-900/90 via-blue-950/30 to-slate-900/80',
+  SAVINGS: 'from-slate-900/90 via-emerald-900/40 to-slate-900/80',
+  CREDIT_CARD: 'from-slate-900/90 via-rose-900/40 to-slate-900/80',
+  BROKERAGE: 'from-slate-900/90 via-purple-900/40 to-slate-900/80',
+  RETIREMENT_401K: 'from-slate-900/90 via-teal-900/40 to-slate-900/80',
+  RETIREMENT_IRA: 'from-slate-900/90 via-teal-900/40 to-slate-900/80',
+  RETIREMENT_ROTH_IRA: 'from-slate-900/90 via-teal-900/40 to-slate-900/80',
+  INVESTMENT: 'from-slate-900/90 via-purple-900/40 to-slate-900/80',
+  OTHER: 'from-slate-900/90 via-slate-900/50 to-slate-900/80',
+}
+
+const institutionDomainMap: Record<string, string> = {
+  bankofamerica: 'bankofamerica.com',
+  chase: 'chase.com',
+  wellsfargo: 'wellsfargo.com',
+  citibank: 'citi.com',
+  usbank: 'usbank.com',
+  pncbank: 'pnc.com',
+  capitalone: 'capitalone.com',
+  tdbank: 'tdbank.com',
+  suntrust: 'suntrust.com',
+  bbt: 'truist.com',
+  navyfederalcreditunion: 'navyfederal.org',
+  stateemployeescreditunion: 'ncsecu.org',
+  pentagonfederalcreditunion: 'penfed.org',
+  allybank: 'ally.com',
+  discoverbank: 'discover.com',
+  americanexpress: 'americanexpress.com',
+  charlesschwab: 'schwab.com',
+  fidelity: 'fidelity.com',
+  vanguard: 'vanguard.com',
+  robinhood: 'robinhood.com',
+  webull: 'webull.com',
+  etrade: 'etrade.com',
+  tdameritrade: 'tdameritrade.com',
+  interactivebrokers: 'interactivebrokers.com',
+  merrilllynch: 'ml.com',
+  morganstanley: 'morganstanley.com',
+  goldmansachs: 'goldmansachs.com',
 }
 
 const normalize = (value?: string | null) =>
   value?.toLowerCase().replace(/[^a-z0-9]/g, '') || ''
 
+const LOGO_DEV_BASE_URL = 'https://img.logo.dev'
+const LOGO_DEV_PARAMS = 'size=96&format=webp&retina=true'
+
 const getInstitutionLogo = (provider?: string | null) => {
+  const token = process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN
+  if (!provider || !token) return null
+
   const normalized = normalize(provider)
-  if (!normalized) return null
-  if (institutionLogoMap[normalized]) {
-    return institutionLogoMap[normalized]
-  }
-  return null
+  const mappedDomain = institutionDomainMap[normalized]
+
+  const providerLooksLikeDomain = provider.includes('.')
+  const cleanedDomain = providerLooksLikeDomain
+    ? provider
+        .toLowerCase()
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .split('/')[0]
+    : null
+
+  const domain = mappedDomain || cleanedDomain
+  if (!domain) return null
+
+  return `${LOGO_DEV_BASE_URL}/${domain}?token=${token}&${LOGO_DEV_PARAMS}`
 }
 
 function sanitizeAccountName(name: string, provider?: string | null) {
@@ -113,6 +141,8 @@ export function AccountCard({
   const institutionIndex = institutionSource.charCodeAt(0) % institutionColors.length
   const institutionColor = institutionColors[institutionIndex]
   const institutionLogo = getInstitutionLogo(account.provider)
+  const gradientBackground =
+    gradientByType[account.type as keyof typeof gradientByType] || gradientByType.OTHER
 
   const handleExpenses = (event: React.MouseEvent) => {
     event.stopPropagation()
@@ -120,7 +150,12 @@ export function AccountCard({
   }
 
   return (
-    <Card className="hover:shadow-lg transition-shadow relative overflow-hidden">
+    <Card
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br text-white shadow-[0_20px_45px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-300 hover:border-white/15 hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] p-5 md:p-6',
+        gradientBackground
+      )}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-shrink-0">
           {institutionLogo && !logoFailed ? (
@@ -198,16 +233,16 @@ export function AccountCard({
           </div>
 
           {showImportOption && importHref && (
-            <div className="mt-4">
+            <div className="mt-4 pt-4 border-t border-white/10">
               <Button
                 variant="ghost"
-                className="text-xs px-3 py-1 text-gray-300 hover:text-white"
+                className="text-xs px-0 py-0 text-gray-300 hover:text-white inline-flex items-center gap-2 justify-start"
                 onClick={(event) => {
                   event.stopPropagation()
                   router.push(importHref)
                 }}
               >
-                <Upload className="w-3 h-3 mr-1" />
+                <Upload className="w-3 h-3" />
                 Import CSV
               </Button>
             </div>

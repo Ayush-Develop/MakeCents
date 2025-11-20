@@ -5,8 +5,10 @@ import {
   getDashboardStats,
   getRecentTransactions,
   getTopCategories,
+  getFinancialHealth,
 } from '@/lib/analytics/dashboard'
 import { getServerUserId } from '@/lib/auth'
+import { FinancialHealthCard } from '@/components/dashboard/FinancialHealthCard'
 
 function formatPercentage(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
@@ -15,10 +17,11 @@ function formatPercentage(value: number) {
 export default async function DashboardPage() {
   const userId = getServerUserId()
 
-  const [stats, recentTransactions, topCategories] = await Promise.all([
+  const [stats, recentTransactions, topCategories, financialHealth] = await Promise.all([
     getDashboardStats(userId),
     getRecentTransactions(userId, 5),
     getTopCategories(userId, 5),
+    getFinancialHealth(userId),
   ])
 
   return (
@@ -77,7 +80,9 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <FinancialHealthCard data={financialHealth} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         <Card>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Recent Transactions

@@ -10,6 +10,22 @@ type DashboardStats = {
   investmentValue: number
 }
 
+export type FinancialHealthSnapshot = {
+  monthLabel: string
+  income: number
+  buckets: {
+    needs: number
+    wants: number
+    savings: number
+    debt: number
+  }
+  burnRate: number
+  wantRate: number
+  savingsPotential: number
+  safeToSpend: number
+  isOnTrack: boolean
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   const now = new Date()
   const startOfCurrentMonth = startOfMonth(now)
@@ -187,6 +203,91 @@ export async function getRecentTransactions(userId: string, limit = 5) {
 export async function getTopCategories(userId: string, limit = 5) {
   const breakdown = await getCategoryBreakdown(userId)
   return breakdown.slice(0, limit)
+}
+
+export async function getFinancialHealth(userId: string): Promise<FinancialHealthSnapshot> {
+  const now = new Date()
+  const monthStart = startOfMonth(now)
+  const monthLabel = format(monthStart, 'MMMM yyyy')
+
+  const [settings, incomeAgg, expenses] = await Promise.all([
+    getUserSettingsRow(userId),
+    prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: {
+        userId,
+        type: 'INCOME',
+        date: { gte: monthStart },
+      },
+    }),
+    prisma.transaction.findMany({
+      where: {
+        userId,
+        type: 'EXPENSE',
+        date: { gte: monthStart },
+      },
+      include: {
+        category: {
+          select: {
+            budgetType: true,
+          },
+        },
+      },
+    }),
+  ])
+
+  const monthlyIncome = incomeAgg._sum.amount || settings?.monthlyNetIncomeGoal || 0
+
+  const buckets = {
+    needs: 0,
+    wants: 0,
+    savings: 0,
+    debt: 0,
+  }
+
+  expenses.forEach((expense) => {
+    const bucket = expense.category?.budgetType?.toUpperCase() || 'WANT'
+    if (bucket === 'NEED') {
+      buckets.needs += expense.amount
+    } else if (bucket === 'WANT') {
+      buckets.wants += expense.amount
+    } else if (bucket === 'SAVINGS') {
+      buckets.savings += expense.amount
+    } else if (bucket === 'DEBT') {
+      buckets.debt += expense.amount
+    } else {
+      buckets.wants += expense.amount
+    }
+  })
+
+  const burnRate = monthlyIncome === 0 ? 0 : (buckets.needs / monthlyIncome) * 100
+  const wantRate = monthlyIncome === 0 ? 0 : (buckets.wants / monthlyIncome) * 100
+  const savingsPotential = Math.max(0, monthlyIncome - buckets.needs - buckets.wants)
+  const safeToSpend = monthlyIncome === 0 ? 0 : monthlyIncome * 0.3 - buckets.wants
+  const isOnTrack = burnRate <= 50 && wantRate <= 30
+
+  return {
+    monthLabel,
+    income: monthlyIncome,
+    buckets,
+    burnRate,
+    wantRate,
+    savingsPotential,
+    safeToSpend,
+    isOnTrack,
+  }
+}
+
+async function getUserSettingsRow(userId: string) {
+  try {
+    const rows = await prisma.$queryRaw<
+      { userId: string; monthlyNetIncomeGoal: number | null; emergencyFundTargetMonths: number | null }[]
+    >`SELECT userId, monthlyNetIncomeGoal, emergencyFundTargetMonths FROM UserSettings WHERE userId = ${userId} LIMIT 1`
+    return rows[0] || null
+  } catch (error) {
+    console.warn('UserSettings table query failed:', error)
+    return null
+  }
 }
 
 

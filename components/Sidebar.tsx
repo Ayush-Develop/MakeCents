@@ -36,7 +36,10 @@ export function Sidebar() {
       </div>
       <nav className="px-4 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
+          const isExactMatch = pathname === item.href
+          const isNestedMatch =
+            item.href !== '/dashboard' && pathname?.startsWith(item.href + '/')
+          const isActive = isExactMatch || isNestedMatch
           return (
             <Link
               key={item.name}

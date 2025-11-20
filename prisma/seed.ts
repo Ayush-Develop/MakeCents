@@ -95,6 +95,8 @@ async function main() {
         type: 'EXPENSE',
         color: '#3b82f6',
         icon: 'utensils',
+        budgetType: 'NEED',
+        budgetTarget: 300,
       },
     }),
     prisma.category.create({
@@ -104,6 +106,8 @@ async function main() {
         type: 'EXPENSE',
         color: '#8b5cf6',
         icon: 'shopping-bag',
+        budgetType: 'WANT',
+        budgetTarget: 250,
       },
     }),
     prisma.category.create({
@@ -113,6 +117,8 @@ async function main() {
         type: 'EXPENSE',
         color: '#10b981',
         icon: 'car',
+        budgetType: 'NEED',
+        budgetTarget: 200,
       },
     }),
     prisma.category.create({
@@ -122,11 +128,44 @@ async function main() {
         type: 'INCOME',
         color: '#10b981',
         icon: 'dollar-sign',
+        budgetType: 'SAVINGS',
       },
     }),
   ])
 
   console.log(`✅ Created ${categories.length} categories`)
+
+  // Create default user settings aligned with SAP plan
+  await prisma.$executeRaw`
+    INSERT INTO UserSettings (
+      userId,
+      monthlyNetIncomeGoal,
+      emergencyFundTargetMonths,
+      planVersion,
+      onboardingCompleted,
+      stepsCompleted,
+      createdAt,
+      updatedAt
+    )
+    VALUES (
+      ${userId},
+      7400,
+      6,
+      'SAP_NEXT_TALENT_2025',
+      0,
+      '[]',
+      CURRENT_TIMESTAMP,
+      CURRENT_TIMESTAMP
+    )
+    ON CONFLICT(userId) DO UPDATE SET
+      monthlyNetIncomeGoal=excluded.monthlyNetIncomeGoal,
+      emergencyFundTargetMonths=excluded.emergencyFundTargetMonths,
+      planVersion=excluded.planVersion,
+      onboardingCompleted=excluded.onboardingCompleted,
+      stepsCompleted=excluded.stepsCompleted,
+      updatedAt=CURRENT_TIMESTAMP
+  `
+  console.log('✅ Created default user settings')
 
   // Create baseline financial goals
   const goals = await Promise.all([
@@ -139,6 +178,8 @@ async function main() {
         currentAmount: 5000,
         targetDate: new Date('2025-12-31'),
         priority: 10,
+        monthlyTarget: 1200,
+        fundingAccountId: savingsAccount.id,
       },
     }),
     prisma.investmentGoal.create({
@@ -150,6 +191,8 @@ async function main() {
         currentAmount: 2500,
         targetDate: new Date('2025-12-31'),
         priority: 8,
+        monthlyTarget: 583.33,
+        fundingAccountId: investmentAccount.id,
       },
     }),
     prisma.investmentGoal.create({
@@ -161,6 +204,8 @@ async function main() {
         currentAmount: 900,
         targetDate: new Date('2025-08-31'),
         priority: 6,
+        monthlyTarget: 250,
+        fundingAccountId: checkingAccount.id,
       },
     }),
   ])
@@ -169,6 +214,8 @@ async function main() {
 
   // Create some sample transactions
   const checkingAccount = accounts[0]
+  const savingsAccount = accounts[1]
+  const investmentAccount = accounts[3]
   const foodCategory = categories[0]
   const shoppingCategory = categories[1]
   const salaryCategory = categories[3]
@@ -229,6 +276,42 @@ async function main() {
   ])
 
   console.log(`✅ Created ${transactions.length} transactions`)
+
+  await prisma.planRule.createMany({
+    data: [
+      {
+        userId,
+        ruleType: '401K_MATCH',
+        isEnabled: true,
+        targetValue: 0.08,
+        metadata: JSON.stringify({ description: 'Contribute 8% to capture full match' }),
+      },
+      {
+        userId,
+        ruleType: 'EMERGENCY_FUND',
+        isEnabled: true,
+        targetValue: 6,
+        metadata: JSON.stringify({ unit: 'months' }),
+      },
+      {
+        userId,
+        ruleType: 'ROTH_MAX',
+        isEnabled: true,
+        targetValue: 7000,
+        metadata: JSON.stringify({ period: 'annual' }),
+      },
+      {
+        userId,
+        ruleType: 'TRAVEL_CAP',
+        isEnabled: true,
+        targetValue: 300,
+        metadata: JSON.stringify({ description: 'Monthly UIUC travel budget' }),
+      },
+    ],
+    skipDuplicates: true,
+  })
+
+  console.log('✅ Seeded baseline plan rules')
 
   console.log('🎉 Seeding completed!')
 }

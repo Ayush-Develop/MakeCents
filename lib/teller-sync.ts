@@ -60,6 +60,21 @@ function mapTellerCategory(tellerCategory: string | null | undefined): string | 
   return categoryMap[tellerCategory.toLowerCase()] || null
 }
 
+function normalizeDescription(value: string | undefined | null) {
+  return (value || '').trim()
+}
+
+function isSapPaycheck(description: string) {
+  const normalized = description.toUpperCase()
+  return normalized.includes('SAP') && normalized.includes('PAYROLL')
+}
+
+function isRelocationStipend(description: string, amount: number) {
+  const normalized = description.toUpperCase()
+  const withinRange = amount >= 3500 && amount <= 4500
+  return normalized.includes('SAP') && !normalized.includes('PAYROLL') && withinRange
+}
+
 /**
  * Sync transactions from Teller API for a specific account
  * This is the core sync logic that can be called from multiple places
@@ -148,11 +163,13 @@ export async function syncTellerTransactions(
         })
       }
 
-      const description =
+      const description = normalizeDescription(
         tellerTx.description ||
-        tellerTx.details?.description ||
-        tellerTx.details?.counterparty?.name ||
-        'Teller transaction'
+          tellerTx.details?.description ||
+          tellerTx.details?.counterparty?.name ||
+          'Teller transaction'
+      )
+      const descriptionLower = description.toLowerCase()
 
       if (!existingTx) {
         existingTx = await prisma.transaction.findFirst({
@@ -211,12 +228,23 @@ export async function syncTellerTransactions(
       const isLikelyRecurring =
         tellerTx.details?.recurring === true ||
         tellerTx.details?.counterparty?.type === 'ach' ||
-        tellerTx.description.toLowerCase().includes('subscription') ||
-        tellerTx.description.toLowerCase().includes('rent')
+        descriptionLower.includes('subscription') ||
+        descriptionLower.includes('rent')
 
       // Create transaction
       const baseTags = tellerTx.status === 'pending' ? ['pending', 'teller'] : ['teller']
-      const tags = tellerTag ? [...baseTags, tellerTag] : baseTags
+      const insightTags: string[] = []
+
+      if (transactionType === 'INCOME') {
+        const absAmount = Math.abs(amount)
+        if (isSapPaycheck(description)) {
+          insightTags.push('salary', 'recurring_income', 'sap_payroll')
+        } else if (isRelocationStipend(description, absAmount)) {
+          insightTags.push('windfall', 'relocation', 'sap_bonus')
+        }
+      }
+
+      const tags = tellerTag ? [...baseTags, ...insightTags, tellerTag] : [...baseTags, ...insightTags]
 
       const transaction = await prisma.transaction.create({
         data: {

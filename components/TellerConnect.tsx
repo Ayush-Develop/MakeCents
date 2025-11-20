@@ -8,6 +8,7 @@ import { Button } from './Button'
 interface TellerConnectProps {
   accountType?: string
   onSuccess?: () => void
+  redirectPath?: string | null
 }
 
 declare global {
@@ -28,7 +29,7 @@ declare global {
   }
 }
 
-export function TellerConnect({ accountType, onSuccess }: TellerConnectProps) {
+export function TellerConnect({ accountType, onSuccess, redirectPath }: TellerConnectProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -158,13 +159,16 @@ export function TellerConnect({ accountType, onSuccess }: TellerConnectProps) {
 
             await Promise.all(accountPromises)
 
-            // Force a hard navigation to ensure server component re-fetches fresh data
             if (onSuccess) {
-              // Call the success handler first
               onSuccess()
             }
-            // Always do a hard navigation to ensure fresh data
-            window.location.href = '/dashboard/accounts'
+            if (redirectPath === null) {
+              router.refresh()
+            } else if (redirectPath) {
+              window.location.href = redirectPath
+            } else {
+              window.location.href = '/dashboard/accounts'
+            }
           } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to link account')
             setIsConnecting(false)
