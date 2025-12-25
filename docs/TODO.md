@@ -706,7 +706,9 @@
   - [x] Set up test environment (jsdom) and mocks (jest.setup.js)
   - [x] Configure path aliases for tests (@/ alias)
   - [x] Add test scripts to package.json (test, test:watch, test:coverage)
-  - [x] Install dependencies: `npm install` (user needs to run - added to package.json)
+  - [x] Create testing documentation (docs/TESTING.md)
+  - [x] Update all documentation references
+  - [ ] Install dependencies: `npm install` (user needs to run)
   - [ ] Verify tests run: `npm test` (after npm install)
 - [ ] Write unit tests for utilities
 - [ ] Write integration tests for API routes
