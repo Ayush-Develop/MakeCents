@@ -42,7 +42,7 @@
 - [x] Verify dev server runs (`npm run dev`)
 
 **Progress Notes**:
-- ✅ Created `SETUP_GUIDE.md` with instructions
+- ✅ Created `docs/SETUP_GUIDE.md` with instructions
 - ✅ Created `scripts/create-env.sh` helper script
 - ✅ Created `lib/auth-config.ts` with NextAuth configuration template
 - ✅ Fixed Teller env variable naming issue (must use `NEXT_PUBLIC_TELLER_APPLICATION_ID` for client-side access)
@@ -227,7 +227,7 @@
 
 **Progress Notes**:
 - Current model has: name, description, targetAmount, currentAmount, targetDate, priority, isCompleted
-- `fundingAccountId` relation mentioned in PHASE_1_FEATURES_GUIDE.md but not in schema
+- `fundingAccountId` relation mentioned in docs/PHASE_1_FEATURES_GUIDE.md but not in schema
 
 ### 3.2 Goal Progress Automation
 - [ ] Create `lib/goals/progress.ts`
@@ -650,7 +650,7 @@
 **Progress Notes**:
 - Broker adapter framework exists
 - Webull and Robinhood mentioned but not fully implemented
-- See `ARCHITECTURE.md` for details
+- See `docs/ARCHITECTURE.md` for details
 
 ### 7.4 Data Export
 - [ ] Create export functionality

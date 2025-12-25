@@ -44,7 +44,7 @@ git checkout -b fix/your-bug-description
 ### 2. Making Changes
 
 - **Write code** following the project's style guide
-- **Update TODO.md** as you make progress
+- **Update docs/TODO.md** as you make progress
 - **Test your changes** locally
 - **Commit frequently** with clear messages
 
@@ -142,7 +142,7 @@ Brief description of what this PR does
   2. Step 2
 
 ## TODO Updates
-- [ ] Updated TODO.md (if applicable)
+- [ ] Updated docs/TODO.md (if applicable)
 - Related module: Module X
 
 ## Screenshots (if UI changes)
@@ -241,20 +241,20 @@ Before requesting review:
 
 ### When to Update Documentation
 
-- **New features**: Update README.md, ARCHITECTURE.md
+- **New features**: Update README.md, docs/ARCHITECTURE.md
 - **API changes**: Update API documentation
-- **Setup changes**: Update SETUP_GUIDE.md
-- **Workflow changes**: Update this file (CODE_WORKFLOW.md)
-- **Progress**: Update TODO.md
+- **Setup changes**: Update docs/SETUP_GUIDE.md
+- **Workflow changes**: Update this file (docs/CODE_WORKFLOW.md)
+- **Progress**: Update docs/TODO.md
 
 ### Documentation Files
 
-- `README.md` - Project overview, quick start
-- `SETUP_GUIDE.md` - Detailed setup instructions
-- `ARCHITECTURE.md` - System architecture
-- `TODO.md` - Development roadmap and progress
-- `CODE_WORKFLOW.md` - This file
-- `TECH_STACK.md` - Technology stack details
+- `README.md` - Project overview, quick start (in root)
+- `docs/SETUP_GUIDE.md` - Detailed setup instructions
+- `docs/ARCHITECTURE.md` - System architecture
+- `docs/TODO.md` - Development roadmap and progress
+- `docs/CODE_WORKFLOW.md` - This file
+- `docs/TECH_STACK.md` - Technology stack details
 
 ---
 
@@ -329,7 +329,7 @@ npm update
 ## 🎯 Agile Practices
 
 ### Sprint Planning
-- Review TODO.md
+- Review docs/TODO.md
 - Select tasks for sprint
 - Break down large tasks
 - Estimate effort
@@ -341,7 +341,7 @@ npm update
 
 ### Sprint Review
 - Demo completed work
-- Update TODO.md progress
+- Update docs/TODO.md progress
 - Plan next sprint
 
 ---
@@ -350,7 +350,7 @@ npm update
 
 ### Stuck on Something?
 
-1. **Check documentation**: README, SETUP_GUIDE, TODO.md
+1. **Check documentation**: README, docs/SETUP_GUIDE.md, docs/TODO.md
 2. **Search codebase**: Use grep or codebase search
 3. **Check issues**: Look for similar issues
 4. **Ask team**: Reach out for help
@@ -379,8 +379,8 @@ git commit -m "feat(scope): description"
 git push origin feature/my-feature
 
 # Update TODO
-# Edit TODO.md, mark completed items
-git add TODO.md
+# Edit docs/TODO.md, mark completed items
+git add docs/TODO.md
 git commit -m "docs(todo): update progress on Module X"
 ```
 

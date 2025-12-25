@@ -100,7 +100,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 - **Webull**: Official OpenAPI available - Framework ready, implementation pending
 - **Robinhood**: Crypto API official, stock trading via unofficial libraries - Framework ready, implementation pending
 
-See `ARCHITECTURE.md` for detailed broker integration information.
+See `docs/ARCHITECTURE.md` for detailed broker integration information.
 
 ## License
 
