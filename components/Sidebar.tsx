@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard,
   Wallet,
@@ -10,8 +11,10 @@ import {
   Target,
   Settings,
   CreditCard,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from './Button'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -26,15 +29,28 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { data: session } = useSession()
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false })
+    router.push('/auth/signin')
+    router.refresh()
+  }
 
   return (
-    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 min-h-screen">
+    <div className="w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 min-h-screen flex flex-col">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
           MakeCents
         </h1>
+        {session?.user?.email && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+            {session.user.email}
+          </p>
+        )}
       </div>
-      <nav className="px-4 space-y-1">
+      <nav className="px-4 space-y-1 flex-1">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
           return (
@@ -54,6 +70,16 @@ export function Sidebar() {
           )
         })}
       </nav>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          className="w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+        >
+          <LogOut className="w-5 h-5 mr-3" />
+          Sign Out
+        </Button>
+      </div>
     </div>
   )
 }

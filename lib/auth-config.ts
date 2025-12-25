@@ -1,8 +1,7 @@
 /**
  * NextAuth.js Configuration
  * 
- * This file will be used to configure NextAuth once we set it up.
- * For now, this is a placeholder showing what we'll need.
+ * Handles user authentication with email/password credentials.
  */
 
 import type { NextAuthOptions } from 'next-auth'
@@ -10,17 +9,6 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from './prisma'
 import bcrypt from 'bcryptjs'
 
-/**
- * NextAuth Configuration
- * 
- * TODO: Uncomment and configure once NextAuth is set up
- * 
- * Steps:
- * 1. Create app/api/auth/[...nextauth]/route.ts
- * 2. Import this config
- * 3. Set up credentials provider
- * 4. Add session callback to include user ID
- */
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -80,7 +68,6 @@ export const authOptions: NextAuthOptions = {
     },
     pages: {
         signIn: '/auth/signin',
-        signUp: '/auth/signup', // We'll create custom signup page
     },
     secret: process.env.NEXTAUTH_SECRET,
 }

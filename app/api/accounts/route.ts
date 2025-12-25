@@ -24,7 +24,7 @@ const accountSchema = z.object({
 
 export async function GET() {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const accounts = await prisma.account.findMany({
       where: { userId, isActive: true },
       orderBy: { createdAt: 'desc' },
@@ -37,7 +37,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const body = await request.json()
     const data = accountSchema.parse(body)
 

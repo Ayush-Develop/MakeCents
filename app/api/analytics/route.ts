@@ -7,7 +7,7 @@ import {
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const { searchParams } = new URL(request.url)
     const metric = searchParams.get('metric') || 'all'
     const months = Number(searchParams.get('months') || '6')

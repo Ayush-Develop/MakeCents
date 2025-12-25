@@ -17,7 +17,7 @@ const transactionSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const { searchParams } = new URL(request.url)
     const accountId = searchParams.get('accountId')
     const startDate = searchParams.get('startDate')
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const body = await request.json()
     const data = transactionSchema.parse(body)
 

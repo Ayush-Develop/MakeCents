@@ -9,7 +9,7 @@ import { getServerUserId } from '@/lib/auth'
  */
 export async function POST(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const body = await request.json()
     const { accountId, startDate, endDate, syncAll } = body
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const results = await syncAllTellerAccounts(userId)
     
     return NextResponse.json({

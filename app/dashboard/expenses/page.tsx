@@ -4,7 +4,7 @@ import { getServerUserId } from '@/lib/auth'
 
 // This is a Server Component that fetches data
 export default async function ExpensesPage() {
-  const userId = getServerUserId()
+  const userId = await getServerUserId()
 
   // Fetch transactions with related data
   const transactions = await prisma.transaction.findMany({
