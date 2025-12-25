@@ -4,31 +4,38 @@
  * To run: npm test
  */
 
-import { authOptions } from '@/lib/auth-config'
-import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+// Mock dependencies BEFORE importing auth-config
+const mockFindUnique = jest.fn()
+const mockCompare = jest.fn()
 
-// Mock dependencies
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
+      findUnique: (...args: any[]) => mockFindUnique(...args),
     },
   },
 }))
 
 jest.mock('bcryptjs', () => ({
-  compare: jest.fn(),
+  compare: (...args: any[]) => mockCompare(...args),
+  hash: jest.fn(),
 }))
+
+// Now import after mocks are set up
+import { authOptions } from '@/lib/auth-config'
 
 describe('NextAuth Configuration', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockFindUnique.mockClear()
+    mockCompare.mockClear()
   })
 
   it('should have credentials provider configured', () => {
     expect(authOptions.providers).toHaveLength(1)
-    expect(authOptions.providers[0].id).toBe('credentials')
+    // CredentialsProvider doesn't expose id directly, but we can check the name
+    const provider = authOptions.providers[0] as any
+    expect(provider.name).toBe('Credentials')
   })
 
   it('should use JWT session strategy', () => {
@@ -47,8 +54,26 @@ describe('NextAuth Configuration', () => {
       expect(result).toBeNull()
     })
 
+    it('should return null for missing email', async () => {
+      const provider = authOptions.providers[0] as any
+      const result = await provider.authorize({
+        password: 'password123',
+      })
+
+      expect(result).toBeNull()
+    })
+
+    it('should return null for missing password', async () => {
+      const provider = authOptions.providers[0] as any
+      const result = await provider.authorize({
+        email: 'test@example.com',
+      })
+
+      expect(result).toBeNull()
+    })
+
     it('should return null for non-existent user', async () => {
-      ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(null)
+      mockFindUnique.mockResolvedValue(null)
 
       const provider = authOptions.providers[0] as any
       const result = await provider.authorize({
@@ -57,7 +82,7 @@ describe('NextAuth Configuration', () => {
       })
 
       expect(result).toBeNull()
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockFindUnique).toHaveBeenCalledWith({
         where: { email: 'nonexistent@example.com' },
       })
     })
@@ -70,8 +95,8 @@ describe('NextAuth Configuration', () => {
         name: 'Test User',
       }
 
-      ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser)
-      ;(bcrypt.compare as jest.Mock).mockResolvedValue(false)
+      mockFindUnique.mockResolvedValue(mockUser)
+      mockCompare.mockResolvedValue(false)
 
       const provider = authOptions.providers[0] as any
       const result = await provider.authorize({
@@ -80,7 +105,10 @@ describe('NextAuth Configuration', () => {
       })
 
       expect(result).toBeNull()
-      expect(bcrypt.compare).toHaveBeenCalledWith('wrong-password', 'hashed-password')
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { email: 'test@example.com' },
+      })
+      expect(mockCompare).toHaveBeenCalledWith('wrong-password', 'hashed-password')
     })
 
     it('should return user object for valid credentials', async () => {
@@ -91,8 +119,8 @@ describe('NextAuth Configuration', () => {
         name: 'Test User',
       }
 
-      ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser)
-      ;(bcrypt.compare as jest.Mock).mockResolvedValue(true)
+      mockFindUnique.mockResolvedValue(mockUser)
+      mockCompare.mockResolvedValue(true)
 
       const provider = authOptions.providers[0] as any
       const result = await provider.authorize({
@@ -105,7 +133,10 @@ describe('NextAuth Configuration', () => {
         email: 'test@example.com',
         name: 'Test User',
       })
-      expect(bcrypt.compare).toHaveBeenCalledWith('correct-password', 'hashed-password')
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { email: 'test@example.com' },
+      })
+      expect(mockCompare).toHaveBeenCalledWith('correct-password', 'hashed-password')
     })
 
     it('should handle user without name', async () => {
@@ -116,8 +147,8 @@ describe('NextAuth Configuration', () => {
         name: null,
       }
 
-      ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser)
-      ;(bcrypt.compare as jest.Mock).mockResolvedValue(true)
+      mockFindUnique.mockResolvedValue(mockUser)
+      mockCompare.mockResolvedValue(true)
 
       const provider = authOptions.providers[0] as any
       const result = await provider.authorize({
@@ -130,6 +161,10 @@ describe('NextAuth Configuration', () => {
         email: 'test@example.com',
         name: undefined,
       })
+      expect(mockFindUnique).toHaveBeenCalledWith({
+        where: { email: 'test@example.com' },
+      })
+      expect(mockCompare).toHaveBeenCalledWith('correct-password', 'hashed-password')
     })
   })
 

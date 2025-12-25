@@ -21,6 +21,8 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@nivo/core": "^0.99.0",
+    "@nivo/sankey": "^0.99.0",
     "@prisma/client": "^5.7.1",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -41,6 +43,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@jest/test-sequencer": "^30.2.0",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",

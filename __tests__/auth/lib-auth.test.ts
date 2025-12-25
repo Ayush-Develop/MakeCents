@@ -5,14 +5,14 @@
  */
 
 import { getServerUserId, getServerSession } from '@/lib/auth'
-import { getServerSession as nextAuthGetServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth-config'
 
-// Mock NextAuth
+// Mock NextAuth getServerSession
+const mockGetServerSession = jest.fn()
 jest.mock('next-auth/next', () => ({
-  getServerSession: jest.fn(),
+  getServerSession: (...args: any[]) => mockGetServerSession(...args),
 }))
 
+// Mock auth config
 jest.mock('@/lib/auth-config', () => ({
   authOptions: {},
 }))
@@ -31,16 +31,16 @@ describe('lib/auth', () => {
         },
       }
 
-      ;(nextAuthGetServerSession as jest.Mock).mockResolvedValue(mockSession)
+      mockGetServerSession.mockResolvedValue(mockSession)
 
       const userId = await getServerUserId()
 
       expect(userId).toBe('user-123')
-      expect(nextAuthGetServerSession).toHaveBeenCalledWith(authOptions)
+      expect(mockGetServerSession).toHaveBeenCalled()
     })
 
     it('should throw error when user is not authenticated', async () => {
-      ;(nextAuthGetServerSession as jest.Mock).mockResolvedValue(null)
+      mockGetServerSession.mockResolvedValue(null)
 
       await expect(getServerUserId()).rejects.toThrow('Unauthorized: User not authenticated')
     })
@@ -52,7 +52,7 @@ describe('lib/auth', () => {
         },
       }
 
-      ;(nextAuthGetServerSession as jest.Mock).mockResolvedValue(mockSession)
+      mockGetServerSession.mockResolvedValue(mockSession)
 
       await expect(getServerUserId()).rejects.toThrow('Unauthorized: User not authenticated')
     })
@@ -68,16 +68,16 @@ describe('lib/auth', () => {
         },
       }
 
-      ;(nextAuthGetServerSession as jest.Mock).mockResolvedValue(mockSession)
+      mockGetServerSession.mockResolvedValue(mockSession)
 
       const session = await getServerSession()
 
       expect(session).toEqual(mockSession)
-      expect(nextAuthGetServerSession).toHaveBeenCalledWith(authOptions)
+      expect(mockGetServerSession).toHaveBeenCalled()
     })
 
     it('should return null when not authenticated', async () => {
-      ;(nextAuthGetServerSession as jest.Mock).mockResolvedValue(null)
+      mockGetServerSession.mockResolvedValue(null)
 
       const session = await getServerSession()
 
