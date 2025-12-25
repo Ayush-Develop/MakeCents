@@ -1,0 +1,213 @@
+# MakeCents - Cursor AI Rules
+
+This file helps AI assistants understand the project structure, conventions, and how to work with this codebase.
+
+## 📚 Key Documentation Files
+
+Always reference these files when working on the project:
+
+- **TODO.md** - Development roadmap, module breakdown, and progress tracking. Update this when completing tasks.
+- **CODE_WORKFLOW.md** - Development workflow, git conventions, and best practices. Follow these guidelines.
+- **ARCHITECTURE.md** - System architecture, database schema, API design, and project structure.
+- **SETUP_GUIDE.md** - Environment setup, dependencies, and configuration instructions.
+- **TECH_STACK.md** - Technology stack details and why each tool is used.
+- **README.md** - Project overview and quick start guide.
+
+## 🏗️ Project Structure
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript (strict mode)
+- **Database**: Prisma ORM with SQLite (dev) / PostgreSQL (production)
+- **Styling**: Tailwind CSS with Radix UI components
+- **State Management**: TanStack Query (React Query)
+- **Charts**: Recharts
+- **Authentication**: NextAuth.js (to be fully implemented)
+
+## 📁 Directory Conventions
+
+- `app/` - Next.js App Router pages and API routes
+  - `app/api/` - API route handlers (RESTful endpoints)
+  - `app/dashboard/` - Dashboard pages (protected routes)
+- `components/` - Reusable React components
+- `lib/` - Utility functions, configurations, and business logic
+- `prisma/` - Database schema and migrations
+- `scripts/` - Utility scripts (TypeScript and shell)
+
+## 🔧 Code Conventions
+
+### TypeScript
+- Use strict typing, avoid `any` types
+- Prefer interfaces for object shapes
+- Use type inference where possible
+- Export types/interfaces from dedicated files if reused
+
+### React Components
+- Use functional components with TypeScript
+- Server components by default, use `'use client'` only when needed
+- Component files: PascalCase (e.g., `AccountCard.tsx`)
+- Props: Define with TypeScript interfaces
+- Use TanStack Query for data fetching in client components
+
+### API Routes
+- Use Next.js App Router API routes (`app/api/`)
+- Always use `getServerUserId()` from `lib/auth.ts` (will be replaced with NextAuth session)
+- Return proper HTTP status codes
+- Use Zod for request validation
+- Handle errors gracefully with try/catch
+
+### Database
+- Use Prisma client from `lib/prisma.ts` (singleton pattern)
+- Always scope queries by `userId` for multi-user support
+- Use transactions for multi-step operations
+- Add indexes for frequently queried fields
+
+### Environment Variables
+- Client-side: Must use `NEXT_PUBLIC_` prefix
+- Server-side: No prefix needed
+- Never commit `.env` files
+- Document new env vars in `SETUP_GUIDE.md`
+
+## 🎯 Development Workflow
+
+1. **Check TODO.md** - See what needs to be done and current progress
+2. **Create feature branch** - Follow naming: `feature/`, `fix/`, `refactor/`, `docs/`
+3. **Make changes** - Follow code conventions and architecture
+4. **Update TODO.md** - Mark completed items, add progress notes
+5. **Commit** - Use conventional commit format: `type(scope): description`
+6. **Test** - Verify changes work locally
+7. **Push & PR** - Follow CODE_WORKFLOW.md guidelines
+
+## 🔐 Security & Best Practices
+
+- **Never commit**:
+  - `.env` files
+  - API keys or secrets
+  - Certificates or private keys
+  - `node_modules/`
+
+- **Always**:
+  - Scope database queries by user ID
+  - Validate user input (use Zod)
+  - Handle errors gracefully
+  - Use environment variables for secrets
+  - Add proper TypeScript types
+
+## 📝 When Making Changes
+
+### Adding New Features
+1. Check TODO.md for related module
+2. Follow existing patterns in codebase
+3. Update relevant documentation
+4. Add to TODO.md progress notes
+5. Test thoroughly
+
+### Fixing Bugs
+1. Reproduce the issue
+2. Fix the root cause
+3. Test the fix
+4. Update documentation if needed
+5. Commit with `fix(scope): description`
+
+### Updating Documentation
+- Keep docs in sync with code changes
+- Update TODO.md when completing tasks
+- Add examples in code comments for complex logic
+- Update SETUP_GUIDE.md for setup changes
+
+## 🧩 Key Patterns
+
+### Authentication (Current State)
+- Currently using placeholder `'user-1'` in `lib/auth.ts`
+- NextAuth.js is configured in `lib/auth-config.ts` but not yet active
+- All API routes use `getServerUserId()` - this will be replaced with NextAuth session
+
+### Data Fetching
+- Server components: Direct Prisma queries
+- Client components: Use TanStack Query with API routes
+- API routes: Use Prisma directly, return JSON
+
+### Error Handling
+- API routes: Return `NextResponse.json({ error: 'message' }, { status: code })`
+- Components: Use try/catch, show user-friendly error messages
+- Log errors for debugging but don't expose sensitive info
+
+### Styling
+- Use Tailwind CSS utility classes
+- Use Radix UI for accessible components
+- Support dark mode (use `dark:` prefix)
+- Keep components responsive (mobile-first)
+
+## 🚫 Common Mistakes to Avoid
+
+- Don't use `any` types - use proper TypeScript types
+- Don't forget to scope queries by `userId`
+- Don't commit `.env` files or secrets
+- Don't use client components unnecessarily
+- Don't forget to update TODO.md when completing work
+- Don't create new patterns - follow existing ones
+- Don't skip error handling
+
+## 📖 Reference These Files
+
+When working on:
+- **Setup/Environment**: See SETUP_GUIDE.md
+- **Architecture**: See ARCHITECTURE.md
+- **Tech Stack**: See TECH_STACK.md
+- **Workflow**: See CODE_WORKFLOW.md
+- **Progress**: See TODO.md
+- **Database**: See DATABASE_SCHEMA_EXPLAINED.md and prisma/schema.prisma
+- **Teller Integration**: See TELLER_API_REFERENCE.md
+
+## 🎨 Component Patterns
+
+### Server Component (Default)
+```typescript
+// app/dashboard/page.tsx
+import { getServerUserId } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+
+export default async function DashboardPage() {
+  const userId = getServerUserId()
+  const data = await prisma.account.findMany({ where: { userId } })
+  return <div>...</div>
+}
+```
+
+### Client Component (When Needed)
+```typescript
+// components/SomeClient.tsx
+'use client'
+import { useQuery } from '@tanstack/react-query'
+
+export function SomeClient() {
+  const { data } = useQuery({ queryKey: ['key'], queryFn: fetchData })
+  return <div>...</div>
+}
+```
+
+### API Route
+```typescript
+// app/api/resource/route.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerUserId } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+
+export async function GET(request: NextRequest) {
+  try {
+    const userId = getServerUserId()
+    const data = await prisma.resource.findMany({ where: { userId } })
+    return NextResponse.json(data)
+  } catch (error) {
+    return NextResponse.json({ error: 'Message' }, { status: 500 })
+  }
+}
+```
+
+## 🔄 Update This File
+
+When adding new conventions or patterns, update this file to keep it current.
+
+---
+
+**Remember**: When in doubt, check the documentation files and follow existing patterns in the codebase.
+
