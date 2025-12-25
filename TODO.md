@@ -818,10 +818,10 @@
 - What's the target user base (individuals, families, small businesses)?
 
 ### Technical Debt:
-- Placeholder authentication needs replacement
 - Some API routes may need optimization
 - Mobile responsiveness needs improvement
-- Test coverage is zero
+- Testing framework needs to be set up (tests written but not yet runnable)
+- UI automator testing framework needed for E2E tests
 
 ---
 

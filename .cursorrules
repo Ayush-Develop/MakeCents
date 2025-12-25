@@ -21,7 +21,7 @@ Always reference these files when working on the project:
 - **Styling**: Tailwind CSS with Radix UI components
 - **State Management**: TanStack Query (React Query)
 - **Charts**: Recharts
-- **Authentication**: NextAuth.js (to be fully implemented)
+- **Authentication**: NextAuth.js (fully implemented)
 
 ## 📁 Directory Conventions
 
@@ -117,9 +117,9 @@ Always reference these files when working on the project:
 ## 🧩 Key Patterns
 
 ### Authentication (Current State)
-- Currently using placeholder `'user-1'` in `lib/auth.ts`
-- NextAuth.js is configured in `lib/auth-config.ts` but not yet active
-- All API routes use `getServerUserId()` - this will be replaced with NextAuth session
+- NextAuth.js is fully configured and active
+- All API routes use `getServerUserId()` which gets user ID from NextAuth session
+- Authentication is required for all dashboard and API routes (protected by middleware)
 
 ### Data Fetching
 - Server components: Direct Prisma queries
