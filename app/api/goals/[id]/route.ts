@@ -18,7 +18,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const body = await request.json()
     const payload = updateGoalSchema.parse(body)
 
@@ -58,7 +58,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const result = await prisma.investmentGoal.deleteMany({
       where: {
         id: params.id,

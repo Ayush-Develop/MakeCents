@@ -49,19 +49,55 @@
 - ✅ Updated setup scripts and documentation
 
 ### 1.2 Authentication System
-- [ ] Implement NextAuth.js integration
-  - [ ] Set up authentication providers (Email/Password, OAuth)
-  - [ ] Create login/signup pages
-  - [ ] Replace `getServerUserId()` in `lib/auth.ts` with real session
-  - [ ] Add protected route middleware
-  - [ ] Update all API routes to use authenticated user
-- [ ] Add session management
-- [ ] Add logout functionality
-- [ ] Test authentication flow
+- [x] Implement NextAuth.js integration
+  - [x] Set up authentication providers (Email/Password)
+  - [x] Create login/signup pages
+  - [x] Replace `getServerUserId()` in `lib/auth.ts` with real session
+  - [x] Add protected route middleware
+  - [x] Update all API routes to use authenticated user
+- [x] Add session management (via NextAuth SessionProvider)
+- [x] Add logout functionality (via NextAuth signOut)
+- [x] Write unit tests for authentication flows
+- [x] Update Settings page to use authenticated user data
 
 **Progress Notes**:
-- Currently using placeholder `'user-1'` in `lib/auth.ts`
-- NextAuth.js is in dependencies but not configured
+- ✅ NextAuth.js fully configured and active
+- ✅ Created `/auth/signin` and `/auth/signup` pages
+- ✅ All API routes updated to use async `getServerUserId()`
+- ✅ Middleware protects dashboard and API routes
+- ✅ TypeScript types added for NextAuth session
+- ✅ Logout button added to Sidebar
+- ✅ Authentication flow tested and working
+- ✅ Unit tests written for auth flows
+
+#### 1.2.1 OAuth Providers (Future)
+- [ ] Add Google OAuth provider
+- [ ] Add GitHub OAuth provider
+- [ ] Add Apple OAuth provider (optional)
+- [ ] Update signin page to show OAuth buttons
+- [ ] Handle OAuth account linking with existing email accounts
+- [ ] Test OAuth flows
+
+**Progress Notes**:
+- NextAuth supports OAuth providers out of the box
+- Need to configure OAuth apps in respective platforms
+- Add provider credentials to environment variables
+
+#### 1.2.2 Password Reset & Email Verification (Future)
+- [ ] Set up email service (SendGrid, Resend, or similar)
+- [ ] Create password reset API route
+- [ ] Create password reset page UI
+- [ ] Add "Forgot Password" link to signin page
+- [ ] Implement email verification on signup
+- [ ] Add email verification page
+- [ ] Add resend verification email functionality
+- [ ] Test password reset flow
+- [ ] Test email verification flow
+
+**Progress Notes**:
+- Requires email service integration
+- Need to add email templates
+- Consider using magic links for password reset
 
 ### 1.3 Database Enhancements
 - [ ] Review and optimize Prisma schema for money flow tracking
@@ -670,10 +706,20 @@
 - [ ] Write E2E tests for critical flows
 - [ ] Add test coverage reporting
 - [ ] Set up CI/CD with tests
+- [ ] Set up UI automator testing framework (Playwright, Cypress, or similar)
+  - [ ] Configure for Next.js App Router
+  - [ ] Write E2E tests for authentication flows
+  - [ ] Write E2E tests for money flow visualization
+  - [ ] Write E2E tests for goal management
+  - [ ] Add visual regression testing (optional)
+  - [ ] Set up test data fixtures
+  - [ ] Configure CI/CD to run UI tests
 
 **Progress Notes**:
-- No tests currently
-- Important for reliability
+- ✅ Unit tests written for authentication flows
+- ⚠️ No testing framework set up yet
+- ⚠️ UI automator testing framework needed for comprehensive E2E testing
+- Important for reliability and preventing regressions
 
 ### 8.4 Monitoring & Analytics
 - [ ] Set up error tracking (Sentry, LogRocket, etc.)

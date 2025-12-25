@@ -3,7 +3,7 @@ import { getServerUserId } from '@/lib/auth'
 import { GoalsClient } from './GoalsClient'
 
 export default async function PlannerPage() {
-  const userId = getServerUserId()
+  const userId = await getServerUserId()
   const goals = await prisma.investmentGoal.findMany({
     where: { userId },
     orderBy: [

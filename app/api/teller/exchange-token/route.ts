@@ -8,7 +8,7 @@ import { getServerUserId } from '@/lib/auth'
  */
 export async function POST(request: NextRequest) {
   try {
-    const userId = getServerUserId()
+    const userId = await getServerUserId()
     const body = await request.json()
     const { accessToken, accountId, institutionId, institutionName: passedInstitutionName, enrollmentId } = body
 

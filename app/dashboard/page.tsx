@@ -13,7 +13,7 @@ function formatPercentage(value: number) {
 }
 
 export default async function DashboardPage() {
-  const userId = getServerUserId()
+  const userId = await getServerUserId()
 
   const [stats, recentTransactions, topCategories] = await Promise.all([
     getDashboardStats(userId),

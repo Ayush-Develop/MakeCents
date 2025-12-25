@@ -1,6 +1,5 @@
 import { tellerApiRequest } from './teller'
 import { prisma } from './prisma'
-import { getServerUserId } from './auth'
 
 /**
  * Map Teller transaction type to our transaction type
@@ -69,10 +68,10 @@ export async function syncTellerTransactions(
   options: {
     startDate?: string
     endDate?: string
-    userId?: string
-  } = {}
+    userId: string // Now required - must be passed from API route
+  }
 ) {
-  const userId = options.userId || getServerUserId()
+  const userId = options.userId
   const { startDate, endDate } = options
 
   // Get account from database
@@ -261,8 +260,8 @@ export async function syncTellerTransactions(
 /**
  * Sync transactions for all Teller-linked accounts
  */
-export async function syncAllTellerAccounts(userId?: string) {
-  const actualUserId = userId || getServerUserId()
+export async function syncAllTellerAccounts(userId: string) {
+  const actualUserId = userId
 
   // Get all Teller-linked accounts
   const accounts = await prisma.account.findMany({
