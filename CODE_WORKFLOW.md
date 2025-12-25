@@ -2,6 +2,8 @@
 
 This document outlines the development workflow and best practices for contributing to MakeCents.
 
+> **Note**: This project uses `.cursorrules` to help AI assistants understand project conventions. The rules file references this and other documentation files for consistency.
+
 ---
 
 ## 🌿 Branch Strategy
