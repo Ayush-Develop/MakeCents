@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+*.log
+devserver.log
 
 # next.js
 /.next/
@@ -23,8 +25,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-*.log
-devserver.log
 
 # local env files
 .env*.local
@@ -41,5 +41,3 @@ next-env.d.ts
 /prisma/migrations
 /prisma/prisma/
 *.db-journal
-
-

@@ -1,7 +1,7 @@
 /**
  * Unit tests for NextAuth configuration
  * 
- * To run: npm test (once testing framework is set up)
+ * To run: npm test
  */
 
 import { authOptions } from '@/lib/auth-config'

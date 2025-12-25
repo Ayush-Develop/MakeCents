@@ -63,6 +63,21 @@ npm run dev
 
 Visit http://localhost:3000
 
+## Step 5: Run Tests (Optional)
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+See `docs/TESTING.md` for more information about testing.
+
 ---
 
 ## NextAuth.js Quick Explanation

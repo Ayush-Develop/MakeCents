@@ -1,7 +1,7 @@
 /**
  * Unit tests for signup API route
  * 
- * To run: npm test (once testing framework is set up)
+ * To run: npm test
  */
 
 import { POST } from '@/app/api/auth/signup/route'
@@ -21,6 +21,7 @@ jest.mock('@/lib/prisma', () => ({
 
 jest.mock('bcryptjs', () => ({
   hash: jest.fn(),
+  compare: jest.fn(),
 }))
 
 describe('POST /api/auth/signup', () => {

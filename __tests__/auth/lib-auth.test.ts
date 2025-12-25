@@ -1,7 +1,7 @@
 /**
  * Unit tests for lib/auth.ts helper functions
  * 
- * To run: npm test (once testing framework is set up)
+ * To run: npm test
  */
 
 import { getServerUserId, getServerSession } from '@/lib/auth'

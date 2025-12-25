@@ -11,6 +11,7 @@ Always reference these files when working on the project:
 - **docs/ARCHITECTURE.md** - System architecture, database schema, API design, and project structure.
 - **docs/SETUP_GUIDE.md** - Environment setup, dependencies, and configuration instructions.
 - **docs/TECH_STACK.md** - Technology stack details and why each tool is used.
+- **docs/TESTING.md** - Testing guide, how to write and run tests.
 - **README.md** - Project overview and quick start guide (in root).
 
 ## 🏗️ Project Structure
@@ -155,6 +156,7 @@ When working on:
 - **Tech Stack**: See docs/TECH_STACK.md
 - **Workflow**: See docs/CODE_WORKFLOW.md
 - **Progress**: See docs/TODO.md
+- **Testing**: See docs/TESTING.md
 - **Database**: See docs/DATABASE_SCHEMA_EXPLAINED.md and prisma/schema.prisma
 - **Teller Integration**: See docs/TELLER_API_REFERENCE.md
 

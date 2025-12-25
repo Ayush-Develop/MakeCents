@@ -20,6 +20,7 @@ A comprehensive financial dashboard application for managing expenses, tracking 
 - **Authentication**: NextAuth.js
 - **Charts**: Recharts
 - **State Management**: TanStack Query
+- **Testing**: Jest with React Testing Library
 
 ## Getting Started
 
@@ -61,6 +62,14 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 - View database: `npm run db:studio`
 - Generate Prisma client: `npm run db:generate`
 - Push schema changes: `npm run db:push`
+
+### Testing
+
+- Run tests: `npm test`
+- Watch mode: `npm run test:watch`
+- Coverage: `npm run test:coverage`
+
+See `docs/TESTING.md` for detailed testing guide.
 
 ## Project Structure
 

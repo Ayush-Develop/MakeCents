@@ -700,7 +700,14 @@
 - PostgreSQL needed for production
 
 ### 8.3 Testing
-- [ ] Set up testing framework (Jest, Vitest, or Playwright)
+- [x] Set up testing framework (Jest, Vitest, or Playwright)
+  - [x] Install Jest and testing dependencies (added to package.json)
+  - [x] Configure Jest for Next.js App Router (jest.config.js)
+  - [x] Set up test environment (jsdom) and mocks (jest.setup.js)
+  - [x] Configure path aliases for tests (@/ alias)
+  - [x] Add test scripts to package.json (test, test:watch, test:coverage)
+  - [x] Install dependencies: `npm install` (user needs to run - added to package.json)
+  - [ ] Verify tests run: `npm test` (after npm install)
 - [ ] Write unit tests for utilities
 - [ ] Write integration tests for API routes
 - [ ] Write E2E tests for critical flows
@@ -717,7 +724,10 @@
 
 **Progress Notes**:
 - ✅ Unit tests written for authentication flows
-- ⚠️ No testing framework set up yet
+- ✅ Jest testing framework configured (jest.config.js, jest.setup.js)
+- ✅ Test scripts added to package.json
+- ✅ Test documentation created (docs/TESTING.md)
+- ⚠️ Need to run `npm install` to install testing dependencies
 - ⚠️ UI automator testing framework needed for comprehensive E2E testing
 - Important for reliability and preventing regressions
 
